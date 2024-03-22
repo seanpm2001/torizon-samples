@@ -3,7 +3,7 @@ source global_variables.sh
 PN='tensorflow-lite'
 PV='2.9.1'
 S=${WORKDIR}'/tensorflow-imx'
-SRCBRANCH='lf-5.15.52_2.1.0'
+SRCBRANCH='lf-5.15.71_2.2.0'
 PYTHON_DIR='/usr/lib/python3.11'
 PYTHON_SITEPACKAGES_DIR=${PYTHON_DIR}'/site-packages'
 BUILD_NUM_JOBS=16

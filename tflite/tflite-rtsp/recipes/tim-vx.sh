@@ -3,7 +3,7 @@ set -e
 source build_variables.sh `basename "$0"`
 source global_variables.sh
 THIS_DIR=$(cd $(dirname $0) && pwd)
-SRCBRANCH='lf-5.15.52_2.1.0'
+SRCBRANCH='lf-5.15.71_2.2.0'
 TIM_VX_SRC='https://github.com/nxp-imx/tim-vx-imx.git'
 PKG_CONFIG_SYSROOT_DIR="/"
 
@@ -23,6 +23,7 @@ pushd ${WORKDIR} && \
 
 pushd ${S} && \
   git clean -df && \
+  git apply ${D}/tim-vx-remove-Werror.patch
   mkdir build && pushd build && \
   cmake ${EXTRA_OECMAKE} .. && make -j`nproc` all install && \
   popd && popd
