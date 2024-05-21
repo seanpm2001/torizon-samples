@@ -54,7 +54,7 @@ Launch the sample application by using the following command, make sure to chang
   --device-cgroup-rule='c 81:* rmw' \
   -e CAPTURE_DEVICE=/dev/video0 \
   -e USE_HW_ACCELERATED_INFERENCE=1 \
-  -e USE_GPU_INFERENCE=1 \
+  -e USE_GPU_INFERENCE=0 \
   -e ACCEPT_FSL_EULA=1 \
   --name tflite-rtsp <image-tag>
 ```
