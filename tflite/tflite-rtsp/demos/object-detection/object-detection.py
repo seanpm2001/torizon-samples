@@ -14,32 +14,23 @@ import tflite_runtime.interpreter as tf #Tensorflow_Lite
 
 
 ## Read Environment Variables
-USE_HW_ACCELERATED_INFERENCE = os.environ.get("USE_HW_ACCELERATED_INFERENCE")
+USE_HW_ACCELERATED_INFERENCE = True
 
-MINIMUM_SCORE = os.environ.get("MINIMUM_SCORE")
-if not MINIMUM_SCORE:
-    MINIMUM_SCORE = 0.55
+## The system returns the variables as Strings, so it's necessary to convert them where we need the numeric value
+if os.environ.get("USE_HW_ACCELERATED_INFERENCE") == "0":
+    USE_HW_ACCELERATED_INFERENCE = False
 
-CAPTURE_DEVICE = os.environ.get("CAPTURE_DEVICE")
-if not CAPTURE_DEVICE:
-    CAPTURE_DEVICE = "/dev/video0"
+MINIMUM_SCORE = float(os.environ.get("MINIMUM_SCORE", default = 0.55))
 
-CAPTURE_RESOLUTION_X = os.environ.get("CAPTURE_RESOLUTION_X")
-if not CAPTURE_RESOLUTION_X:
-    CAPTURE_RESOLUTION_X = 640
+CAPTURE_DEVICE = os.environ.get("CAPTURE_DEVICE", default = "/dev/video0")
 
-CAPTURE_RESOLUTION_Y = os.environ.get("CAPTURE_RESOLUTION_Y")
-if not CAPTURE_RESOLUTION_Y:
-    CAPTURE_RESOLUTION_Y = 480
+CAPTURE_RESOLUTION_X = int(os.environ.get("CAPTURE_RESOLUTION_X", default = 640))
 
-CAPTURE_FRAMERATE = os.environ.get("CAPTURE_FRAMERATE")
-if not CAPTURE_FRAMERATE:
-    CAPTURE_FRAMERATE = 30
+CAPTURE_RESOLUTION_Y = int(os.environ.get("CAPTURE_RESOLUTION_Y", default = 480))
 
-STREAM_BITRATE = os.environ.get("STREAM_BITRATE")
-if not STREAM_BITRATE:
-    STREAM_BITRATE = 2048
+CAPTURE_FRAMERATE = int(os.environ.get("CAPTURE_FRAMERATE", default = 30))
 
+STREAM_BITRATE = int(os.environ.get("STREAM_BITRATE", default = 2048))
 
 ## Helper function to draw bounding boxes
 def draw_bounding_boxes(img,labels,x1,x2,y1,y2,object_class):
