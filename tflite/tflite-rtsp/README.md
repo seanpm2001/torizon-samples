@@ -63,7 +63,7 @@ Note: Toradex provides pre-built images for this sample, just replace **image-ta
 
 ## Run the RTSP client
 
-On your development machine, make sure to have GStreamer installed. If you need to install, refer to [Installing GStreamer](https://gstreamer.freedesktop.org/documentation/installing/index.html?gi-language=c).
+On your development machine, make sure to have GStreamer installed. If you need to install it, refer to [Installing GStreamer](https://gstreamer.freedesktop.org/documentation/installing/index.html?gi-language=c).
 
 Then, you are able to run one of the command below on your PC, according to the desired environment:
 
