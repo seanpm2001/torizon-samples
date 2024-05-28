@@ -131,6 +131,12 @@ class InferenceDataFactory(GstRtspServer.RTSPMediaFactory):
 
                 # Set the input tensor
                 input=np.array([cv2.cvtColor(image, cv2.COLOR_BGR2RGB)],dtype=np.uint8)
+
+                # Normalize pixel values if using a floating model (i.e. if model is non-quantized)
+                # This is valid for mobilenet architecture and may not be valid for other architectures 
+                if self.input_details[0]['dtype'] == np.float32:
+                    input = (np.float32(input) - 127.5) / 127.5
+
                 self.interpreter.set_tensor(self.input_details[0]['index'], input)
 
                 # Execute the inference
