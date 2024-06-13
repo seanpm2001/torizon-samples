@@ -135,13 +135,23 @@ class InferenceDataFactory(GstRtspServer.RTSPMediaFactory):
                 self.interpreter.invoke()
                 t2=time()
                 
+                # Check output layer name to determine if this model was created with TF2 or TF1,
+                # because outputs are ordered differently for TF2 and TF1 models. This is valid
+                # for mobilenet architecture and may not be valid for other architectures
+                outname = self.output_details[0]['name']
+
+                if ('StatefulPartitionedCall' in outname): # This is a TF2 model
+                    locations_idx, classes_idx, scores_idx, detections_idx = 1, 3, 0, 2
+                else: # This is a TF1 model
+                    locations_idx, classes_idx, scores_idx, detections_idx = 0, 1, 2, 3
+
                 # Check the detected object locations, classes and scores.
-                locations = (self.interpreter.get_tensor(self.output_details[0]['index'])[0]*width1).astype(int)
+                locations = (self.interpreter.get_tensor(self.output_details[locations_idx]['index'])[0]*width1).astype(int)
                 locations[locations < 0] = 0
                 locations[locations > width1] = width1
-                classes = self.interpreter.get_tensor(self.output_details[1]['index'])[0].astype(int)
-                scores = self.interpreter.get_tensor(self.output_details[2]['index'])[0]
-                n_detections = self.interpreter.get_tensor(self.output_details[3]['index'])[0].astype(int)
+                classes = self.interpreter.get_tensor(self.output_details[classes_idx]['index'])[0].astype(int)
+                scores = self.interpreter.get_tensor(self.output_details[scores_idx]['index'])[0]
+                n_detections = self.interpreter.get_tensor(self.output_details[detections_idx]['index'])[0].astype(int)
 
                 # Draw the bounding boxes for the detected objects
                 img = image_original
