@@ -1,0 +1,21 @@
+services:
+  tflite-rtsp:
+    image: torizonextras/arm64v8-sample-tflite-rtsp:${CT_TAG_DEBIAN} # This is a Toradex image example, replace to your image
+    container_name: tflite-rtsp
+    ports:
+      - "8554:8554"
+    volumes:
+      - /dev:/dev
+      - /tmp:/tmp
+      - /run/udev/:/run/udev/
+    environment:
+      - CAPTURE_DEVICE=/dev/video0
+      - USE_HW_ACCELERATED_INFERENCE=1
+      - USE_GPU_INFERENCE=0
+      - ACCEPT_FSL_EULA=1
+    device_cgroup_rules:
+      - 'c 4:* rmw'
+      - 'c 13:* rmw'
+      - 'c 199:* rmw'
+      - 'c 226:* rmw'
+      - 'c 81:* rmw'
