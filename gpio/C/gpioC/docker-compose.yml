@@ -7,13 +7,21 @@ services:
     image: ${LOCAL_REGISTRY}:5002/gpioc-debug:${TAG}
     ports:
       - 2230:2230
-    devices:
-      - "/dev/gpiochip0"
+    device_cgroup_rules:
+      - "c 254:* rmw"
+    volumes:
+      - type: bind
+        source: /dev
+        target: /dev
 
   gpioc:
     build:
       context: .
       dockerfile: Dockerfile
     image: ${DOCKER_LOGIN}/gpioc:${TAG}
-    devices:
-      - "/dev/gpiochip0"
+    device_cgroup_rules:
+      - "c 254:* rmw"
+    volumes:
+      - type: bind
+        source: /dev
+        target: /dev
