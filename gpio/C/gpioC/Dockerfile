@@ -1,5 +1,5 @@
-ARG CROSS_SDK_BASE_TAG=3.2.1-bookworm
-ARG BASE_VERSION=3.2.1-bookworm
+ARG CROSS_SDK_BASE_TAG=3.3.0-bookworm
+ARG BASE_VERSION=3.3.0-bookworm
 ##
 # Board architecture
 # arm or arm64
@@ -39,11 +39,11 @@ RUN rm -rf ${APP_ROOT}/build-${IMAGE_ARCH}
 
 # Compile the application
 RUN if [ "$IMAGE_ARCH" = "arm64" ] ; then \
-        make ARCH=${IMAGE_ARCH} CC=aarch64-linux-gnu-gcc ; \
+        make ARCH=${IMAGE_ARCH} CC=aarch64-linux-gnu-g++ ; \
     elif [ "$IMAGE_ARCH" = "arm" ] ; then \
-        make ARCH=${IMAGE_ARCH} CC=arm-linux-gnueabihf-gcc ; \
+        make ARCH=${IMAGE_ARCH} CC=arm-linux-gnueabihf-g++ ; \
     elif [ "$IMAGE_ARCH" = "amd64" ] ; then \
-        make ARCH=${IMAGE_ARCH} CC=x86_64-linux-gnu-gcc ; \
+        make ARCH=${IMAGE_ARCH} CC=x86_64-linux-gnu-g++ ; \
     fi
 
 # BUILD ------------------------------------------------------------------------

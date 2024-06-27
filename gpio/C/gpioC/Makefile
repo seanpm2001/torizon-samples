@@ -1,8 +1,8 @@
 # tool macros
-CC := gcc
+CC := g++
 CCFLAGS := -Iincludes/
 DBGFLAGS := -g
-LDFLAGS := -lgpiod
+LDFLAGS :=
 CCOBJFLAGS := $(CCFLAGS) -c
 ARCH :=
 
