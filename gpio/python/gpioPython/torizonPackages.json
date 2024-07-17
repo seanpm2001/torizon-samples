@@ -1,8 +1,0 @@
-{
-    "deps": [
-        "python3-libgpiod"
-    ],
-    "devDeps": [
-        "python3-libgpiod"
-    ]
-}
