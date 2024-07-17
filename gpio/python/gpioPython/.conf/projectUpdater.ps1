@@ -9,6 +9,7 @@ $errorActionPreference = "Stop"
 
 $projectFolder = $args[0]
 $projectName = $args[1]
+$acceptAll = $args[2]
 
 function _checkArg ($_arg) {
     if ([string]::IsNullOrEmpty($_arg)) {
@@ -17,6 +18,7 @@ function _checkArg ($_arg) {
 }
 
 function _checkIfFileContentIsEqual ($_file1, $_file2) {
+
     $file1 = Get-FileHash $_file1
     $file2 = Get-FileHash $_file2
 
@@ -27,17 +29,61 @@ function _checkIfFileContentIsEqual ($_file1, $_file2) {
     }
 }
 
-function _openMergeWindow ($_path1, $_path2) {
+function _openMergeWindow ($_updatedFile, $_currentFile) {
+    if ($acceptAll -eq $true) {
+        # If the source doesn't exist anymore on the .apollox repo of the
+        # template, remove it from the project being updated
+        if (-not (Test-Path -Path $_updatedFile )) {
+            Remove-Item -Path $_currentFile
+        } else {
+            Copy-Item $_updatedFile $_currentFile
+        }
+        return
+    }
+
+    # If one of the files doesn't exist create an empty one
+    if (-not (Test-Path -Path $_updatedFile )) {
+        New-Item -Path $_updatedFile -ItemType File
+    } elseif (-not (Test-Path -Path $_currentFile )) {
+        New-Item -Path $_currentFile -ItemType File
+    }
+
     if (
-        -not (_checkIfFileContentIsEqual $_path1 $_path2)
+        -not (_checkIfFileContentIsEqual $_updatedFile $_currentFile)
     ) {
-        code --wait --diff $_path1 $_path2
+        code --wait --diff $_updatedFile $_currentFile
+        # If after the code diff the file is still empty, that means that
+        # this file should not be added to the project, so let's remove this
+        # empty file that we have just created above
+        if ($null -eq (Get-Content $_currentFile)) {
+            Remove-Item -Path $_currentFile
+        }
     }
 }
 
 # check if the args passed are not empty
 _checkArg $projectFolder
 _checkArg $projectName
+
+# the accept all is optional
+if ([string]::IsNullOrEmpty($acceptAll)) {
+    $acceptAll = $false
+} else {
+    if ($acceptAll -eq "1") {
+        # ask for confirmation
+        Write-Host -ForegroundColor Yellow "You are about to accept all incoming changes from the updated template"
+        Write-Host -ForegroundColor Yellow "If the project is not versioned there is no way back"
+        $_sure = Read-Host -Prompt "Accept all changes? [y/n]"
+
+        if ($_sure -ne "y") {
+            exit 0
+        }
+
+        $acceptAll = $true
+    } else {
+        $acceptAll = $false
+    }
+}
 
 # copy the new one and make the subs
 $templateName = Get-Content $projectFolder/.conf/.template
@@ -50,7 +96,7 @@ if (-not (Test-Path $projectFolder/.conf/tmp)) {
 
 # get the metadata
 $_metadata = Get-Content "$Env:HOME/.apollox/templates.json" | ConvertFrom-Json
-$_templateMetadata = 
+$_templateMetadata =
     $_metadata.Templates |
         Where-Object { $_.folder -eq $templateName }
 
@@ -60,10 +106,6 @@ Copy-Item `
     $Env:HOME/.apollox/$templateName/.conf/update.json `
     $projectFolder/.conf/update.json
 
-# DEPS.JSON:
-Copy-Item `
-    $Env:HOME/.apollox/$templateName/.conf/deps.json `
-    $projectFolder/.conf/deps.json
 
 # PROJECT UPDATER:
 if (
@@ -84,10 +126,16 @@ if (
     # run the project updater again
     & $projectFolder/.conf/projectUpdater.ps1 `
         $projectFolder `
-        $projectName
+        $projectName `
+        $acceptAll
 
     exit $LASTEXITCODE
 }
+
+# TASKS.PS1:
+Copy-Item `
+    $Env:HOME/.apollox/scripts/tasks.ps1 `
+    $projectFolder/.vscode/tasks.ps1
 
 # CHECK DEPS
 Copy-Item `
@@ -129,6 +177,11 @@ Copy-Item `
     $Env:HOME/.apollox/scripts/checkCIEnv.ps1 `
     $projectFolder/.conf/checkCIEnv.ps1
 
+# VALIDATE DEPS RUNNING ENV:
+Copy-Item `
+    $Env:HOME/.apollox/scripts/validateDepsRunning.ps1 `
+    $projectFolder/.conf/validateDepsRunning.ps1
+
 Write-Host -ForegroundColor DarkGreen "✅ always accept new"
 # ----------------------------------------------------------- ALWAYS ACCEPT NEW
 
@@ -144,14 +197,14 @@ Copy-Item $Env:HOME/.apollox/$templateName/.vscode/tasks.json `
 
 if ($_templateMetadata.mergeCommon -ne $False) {
     Write-Host -ForegroundColor Yellow "Applying common tasks ..."
-    $commonTasks = 
-        Get-Content "$env:HOME/.apollox/assets/tasks/common.json" | 
+    $commonTasks =
+        Get-Content "$env:HOME/.apollox/assets/tasks/common.json" |
             ConvertFrom-Json
-    $commonInputs = 
-        Get-Content "$env:HOME/.apollox/assets/tasks/inputs.json" | 
+    $commonInputs =
+        Get-Content "$env:HOME/.apollox/assets/tasks/inputs.json" |
             ConvertFrom-Json
-    $projTasks = 
-        Get-Content "$projectFolder/.conf/tmp/tasks-next.json" | 
+    $projTasks =
+        Get-Content "$projectFolder/.conf/tmp/tasks-next.json" |
             ConvertFrom-Json
 
     $projTasks.tasks += $commonTasks.tasks
@@ -164,12 +217,58 @@ if ($_templateMetadata.mergeCommon -ne $False) {
 
 # we need to create a tmp folder to the update files
 Set-Location $projectFolder/.conf/tmp
-Copy-Item $Env:HOME/.apollox/$templateName/Dockerfile .
-Copy-Item $Env:HOME/.apollox/$templateName/Dockerfile.debug .
-Copy-Item $Env:HOME/.apollox/$templateName/docker-compose.yml .
+
+# tcb does not have the common Docker files
+if ($templateName -ne "tcb") {
+    # The generic template doesn't have a Dockerfile.debug
+    if ($templateName -ne "genericTemplate") {
+        Copy-Item $Env:HOME/.apollox/$templateName/Dockerfile.debug .
+    }
+    Copy-Item $Env:HOME/.apollox/$templateName/Dockerfile .
+    Copy-Item $Env:HOME/.apollox/$templateName/docker-compose.yml .
+    Copy-Item $Env:HOME/.apollox/assets/github/workflows/build-application.yaml .
+    Copy-Item $Env:HOME/.apollox/assets/gitlab/.gitlab-ci.yml .
+    Copy-Item $Env:HOME/.apollox/$templateName/.doc/README.md .
+}
+
 Copy-Item $Env:HOME/.apollox/$templateName/.gitignore .
-Copy-Item $Env:HOME/.apollox/assets/github/workflows/build-application.yaml .
-Copy-Item $Env:HOME/.apollox/assets/gitlab/.gitlab-ci.yml .
+
+
+# DEPS.JSON:
+Copy-Item $Env:HOME/.apollox/$templateName/.conf/deps.json .
+
+# Check if there are scripts defined in the .conf/deps.json of the template and, if so,
+# copy them to the .conf of the project
+$_deps = Get-Content  ./deps.json | ConvertFrom-Json
+
+# If there are installation scripts listed on the .conf/deps.json of the template
+if (($_deps.installDepsScripts.Count -gt 0)) {
+    # Create the installDepsScripts dir on the .conf/tmp dir
+    if (-not (Test-Path -Path ./installDepsScripts )){
+        New-Item -ItemType Directory -Path ./installDepsScripts
+    }
+    # If there is no script in the .conf/installDepsScripts of the template, but there is some script defined in the
+    # installDepsScripts with the .conf/installDepsScripts path, then it comes from the scripts/installDepsScripts
+    # folder of the vscode-torizon-templates repo. This is useful when there are scripts that are common for many
+    # templates, like the installDotnetSDK8.sh one for example.
+    foreach ($script in $_deps.installDepsScripts) {
+
+        if ((-not (Test-Path -Path $Env:HOME/.apollox/$templateName/$script )) -and
+            $script -match  ".conf/installDepsScripts") {
+            # Copy the script from the scripts/installDepsScripts folder to the .conf/installDepsScripts folder of the template
+            $scriptSource = $script.Replace(".conf","scripts")
+            $scriptDest = $script.Replace(".conf/","")
+            Copy-Item $Env:HOME/.apollox/$scriptSource ./$scriptDest
+        } else {
+            $scriptDest = $script.Replace(".conf/","")
+            Copy-Item $Env:HOME/.apollox/$templateName/$script ./$scriptDest
+        }
+    }
+}
+
+
+
+
 
 # read the update table:
 for ($i = 0; $i -lt $updateTable.Count; $i++) {
@@ -192,22 +291,22 @@ Get-ChildItem -Force -File -Recurse * | ForEach-Object {
             if ($_ -isnot [System.IO.DirectoryInfo]) {
                 ( Get-Content $a ) |
                 ForEach-Object {
-                    $_ -replace "gpioPython",$projectName
+                    $_ -replace "__change__",$projectName
                 } | Set-Content $a
 
                 ( Get-Content $a ) |
                 ForEach-Object {
-                    $_ -replace "gpiopython",$containerName
+                    $_ -replace "__container__",$containerName
                 } | Set-Content $a
 
                 ( Get-Content $a ) |
                 ForEach-Object {
-                    $_ -replace "/home/andreriesco",$env:HOME
+                    $_ -replace "__home__",$env:HOME
                 } | Set-Content $a
-                
+
                 ( Get-Content $a ) |
                 ForEach-Object {
-                    $_ -replace "python3Console", $templateName
+                    $_ -replace "__templateFolder__", $templateName
                 } | Set-Content $a
             }
         } elseif (-not $a.Contains("id_rsa.pub")) {
@@ -233,35 +332,64 @@ Write-Host -ForegroundColor DarkGreen "✅ tasks.json"
 
 
 # ---------------------------------------------------------------------- COMMON
-# DOCKERFILE:
-_openMergeWindow `
-    $projectFolder/.conf/tmp/Dockerfile `
-    $projectFolder/Dockerfile
 
-# DOCKERFILE.DEBUG:
-_openMergeWindow `
-    $projectFolder/.conf/tmp/Dockerfile.debug `
-    $projectFolder/Dockerfile.debug
+# TCB does not have the common application Docker files
+if ($templateName -ne "tcb") {
+    # DOCKERFILE.DEBUG:
+    # The generic template doesn't have a Dockerfile.debug
+    if ($templateName -ne "genericTemplate") {
+        _openMergeWindow `
+            $projectFolder/.conf/tmp/Dockerfile.debug `
+            $projectFolder/Dockerfile.debug
+    }
+    # DOCKERFILE:
+    _openMergeWindow `
+        $projectFolder/.conf/tmp/Dockerfile `
+        $projectFolder/Dockerfile
+    # DOCKER-COMPOSE:
+    _openMergeWindow `
+        $projectFolder/.conf/tmp/docker-compose.yml `
+        $projectFolder/docker-compose.yml
 
-# DOCKER-COMPOSE:
-_openMergeWindow `
-    $projectFolder/.conf/tmp/docker-compose.yml `
-    $projectFolder/docker-compose.yml
+    # GITHUB ACTIONS:
+    _openMergeWindow `
+        $projectFolder/.conf/tmp/build-application.yaml `
+        $projectFolder/.github/workflows/build-application.yaml
 
-# GITHUB ACTIONS:
-_openMergeWindow `
-    $projectFolder/.conf/tmp/build-application.yaml `
-    $projectFolder/.github/workflows/build-application.yaml
+    # GITLAB CI:
+    _openMergeWindow `
+        $projectFolder/.conf/tmp/.gitlab-ci.yml `
+        $projectFolder/.gitlab-ci.yml
 
-# GITLAB CI:
-_openMergeWindow `
-    $projectFolder/.conf/tmp/.gitlab-ci.yml `
-    $projectFolder/.gitlab-ci.yml
+    # TEMPLATE SPECIFIC DOCUMENTATION:
+    # check if the folder already exists, if not create it
+    # and always accept the new one
+    if (-not (Test-Path $projectFolder/.doc)) {
+        mkdir $projectFolder/.doc
+    }
+
+    Copy-Item `
+        $Env:HOME/.apollox/$templateName/.doc/README.md `
+        $projectFolder/.doc/README.md
+}
 
 # GITIGNORE:
 _openMergeWindow `
     $projectFolder/.conf/tmp/.gitignore `
     $projectFolder/.gitignore
+
+# DEPS.JSON:
+_openMergeWindow `
+    $projectFolder/.conf/tmp/deps.json `
+    $projectFolder/.conf/deps.json
+
+# Install dependencies scripts
+foreach ($script in $_deps.installDepsScripts) {
+    $scriptSource = $script.Replace(".conf/","")
+    _openMergeWindow `
+        $projectFolder/.conf/tmp/$scriptSource `
+        $projectFolder/$script
+}
 
 Write-Host -ForegroundColor DarkGreen "✅ common"
 # ---------------------------------------------------------------------- COMMON
@@ -274,9 +402,16 @@ for ($i = 0; $i -lt $updateTable.Count; $i++) {
     $_target = $updateTable[$i].target
     $_target = (Invoke-Expression "echo `"$_target`"")
 
-    _openMergeWindow `
-        $projectFolder/.conf/tmp/$_source `
-        $projectFolder/$_target
+    # check if the file exists, if not simple copy it
+    if (
+        (Test-Path $projectFolder/$_target) -eq $True
+    ) {
+        _openMergeWindow `
+            $projectFolder/.conf/tmp/$_source `
+            $projectFolder/$_target
+    } else {
+        cp $projectFolder/.conf/tmp/$_source $projectFolder/$_target
+    }
 }
 
 Write-Host -ForegroundColor DarkGreen "✅ specific"
