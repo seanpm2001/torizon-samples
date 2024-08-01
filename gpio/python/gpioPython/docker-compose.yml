@@ -20,9 +20,5 @@ services:
       context: .
       dockerfile: Dockerfile
     image: ${DOCKER_LOGIN}/gpiopython:${TAG}
-    device_cgroup_rules:
-      - "c 254:* rmw"
-    volumes:
-      - type: bind
-        source: /dev
-        target: /dev
+    devices:
+      - "/dev/gpiochip0"
