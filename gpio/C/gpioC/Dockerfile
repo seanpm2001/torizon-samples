@@ -23,6 +23,7 @@ RUN apt-get -q -y update && \
     apt-get -q -y install \
 # DO NOT REMOVE THIS LABEL: this is used for VS Code automation
     # __torizon_packages_dev_start__
+	libgpiod-dev:arm64 \
     # __torizon_packages_dev_end__
 # DO NOT REMOVE THIS LABEL: this is used for VS Code automation
     && \
@@ -39,11 +40,11 @@ RUN rm -rf ${APP_ROOT}/build-${IMAGE_ARCH}
 
 # Compile the application
 RUN if [ "$IMAGE_ARCH" = "arm64" ] ; then \
-        make ARCH=${IMAGE_ARCH} CC=aarch64-linux-gnu-g++ ; \
+        make ARCH=${IMAGE_ARCH} CC=aarch64-linux-gnu-gcc ; \
     elif [ "$IMAGE_ARCH" = "arm" ] ; then \
-        make ARCH=${IMAGE_ARCH} CC=arm-linux-gnueabihf-g++ ; \
+        make ARCH=${IMAGE_ARCH} CC=arm-linux-gnueabihf-gcc ; \
     elif [ "$IMAGE_ARCH" = "amd64" ] ; then \
-        make ARCH=${IMAGE_ARCH} CC=x86_64-linux-gnu-g++ ; \
+        make ARCH=${IMAGE_ARCH} CC=x86_64-linux-gnu-gcc ; \
     fi
 
 # BUILD ------------------------------------------------------------------------
@@ -58,6 +59,7 @@ ARG APP_ROOT
 RUN apt-get -y update && apt-get install -y --no-install-recommends \
 # DO NOT REMOVE THIS LABEL: this is used for VS Code automation
     # __torizon_packages_prod_start__
+	libgpiod2:arm64 \
     # __torizon_packages_prod_end__
 # DO NOT REMOVE THIS LABEL: this is used for VS Code automation
 	&& apt-get clean && apt-get autoremove && rm -rf /var/lib/apt/lists/*
