@@ -8,9 +8,13 @@ services:
     ports:
       - 6502:6502
       - 6512:6512
-    devices:
-      - "/dev/gpiochip0"
-    
+    device_cgroup_rules:
+      - "c 254:* rmw"
+    volumes:
+      - type: bind
+        source: /dev
+        target: /dev
+
   gpiopython:
     build:
       context: .

@@ -3,21 +3,21 @@
 # Board architecture
 ##
 ARG IMAGE_ARCH=
-# For armv7 use:
-#ARG IMAGE_ARCH=arm
 
 ##
 # Base container version
 ##
-ARG BASE_VERSION=3-bookworm
+ARG BASE_VERSION=3.3.0-bookworm
 
-ARG APP_ROOT=/home/torizon
+##
+# Directory of the application inside container
+##
+ARG APP_ROOT=
 
 FROM --platform=linux/${IMAGE_ARCH} \
     torizon/debian:${BASE_VERSION} AS Deploy
 
 ARG IMAGE_ARCH
-ARG APP_EXECUTABLE
 ARG APP_ROOT
 
 # your regular RUN statements here
@@ -43,12 +43,13 @@ RUN . ${APP_ROOT}/.venv/bin/activate && \
     pip3 install --upgrade pip && pip3 install -r requirements-release.txt && \
     rm requirements-release.txt
 
-# copy the source code
-COPY /src ${APP_ROOT}/src
+# Copy the application source code in the workspace to the $APP_ROOT directory
+# path inside the container, where $APP_ROOT is the torizon_app_root
+# configuration defined in settings.json
+COPY ./src ${APP_ROOT}/src
 
 WORKDIR ${APP_ROOT}
 
 ENV APP_ROOT=${APP_ROOT}
 # Activate and run the code
 CMD . ${APP_ROOT}/.venv/bin/activate && python3 src/main.py --no-sandbox
-

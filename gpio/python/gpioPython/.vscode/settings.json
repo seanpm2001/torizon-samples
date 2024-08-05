@@ -14,5 +14,6 @@
   "torizon_run_as": "torizon",
   "torizon_app_root": "/home/torizon",
   "tcb.packageName": "gpioPython",
-  "tcb.version": "early-access"
+  "tcb.version": "early-access",
+  "torizon_ssh_port": ""
 }
