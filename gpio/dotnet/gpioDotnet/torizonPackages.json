@@ -4,6 +4,7 @@
     ],
     "devDeps": [
         "libgpiod-dev",
-        "libgpiod2"
+        "gpiod"
+        
     ]
 }

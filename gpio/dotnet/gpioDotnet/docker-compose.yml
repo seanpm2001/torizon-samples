@@ -7,8 +7,12 @@ services:
     image: ${LOCAL_REGISTRY}:5002/gpiodotnet-debug:${TAG}
     ports:
       - 2222:2222
-    devices:
-      - "/dev/gpiochip0"
+    device_cgroup_rules:
+      - "c 254:* rmw"
+    volumes:
+      - type: bind
+        source: /dev
+        target: /dev
 
   gpiodotnet:
     build:
