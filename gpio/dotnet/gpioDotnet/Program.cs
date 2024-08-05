@@ -1,5 +1,3 @@
-using System;
-using System.Threading;
 using System.Device.Gpio;
 using System.Device.Gpio.Drivers;
 
@@ -7,11 +5,9 @@ class Program
 {
     static void Main()
     {
-        int gpioLine = 7; //Equivalent to "SODIMM_55" on libgpiod (which is the
-        // A0 pin on the Aster Carrier Board)
-        int gpioChip = 0;// Equivalent to "/dev/gpiochip0"
+        int gpioLine = 7; // "SODIMM_55" - Example of pin A0 on Aster Carrier Board;
+        int gpioChip = 0;// "/dev/gpiochip0" - Example of pin A0 on Aster Carrier Board;
         LibGpiodDriver gpiodDriver = new LibGpiodDriver(gpioChip);
-
         GpioController gpioController = new GpioController(PinNumberingScheme.Logical, gpiodDriver);
 
         gpioController.OpenPin(gpioLine, PinMode.Output);

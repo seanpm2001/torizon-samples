@@ -7,24 +7,24 @@ ARG IMAGE_ARCH=
 ##
 # Base container version
 ##
-ARG BASE_VERSION=3-6.0
+ARG BASE_VERSION=3.1.0-8.0.2
 
 ##
-# Application Name
+# Directory of the application inside container
 ##
-ARG APP_EXECUTABLE=gpioDotnet
+ARG APP_ROOT=
 # ARGUMENTS --------------------------------------------------------------------
 
 
 
 # BUILD ------------------------------------------------------------------------
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS Build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS Build
 
 ARG IMAGE_ARCH
-ARG APP_EXECUTABLE
+ARG APP_ROOT
 
-COPY . /build
-WORKDIR /build
+COPY . ${APP_ROOT}
+WORKDIR ${APP_ROOT}
 
 # build
 RUN dotnet restore && \
@@ -38,8 +38,7 @@ FROM --platform=linux/${IMAGE_ARCH} \
     torizon/dotnet:${BASE_VERSION} AS Deploy
 
 ARG IMAGE_ARCH
-ARG APP_EXECUTABLE
-ENV APP_EXECUTABLE ${APP_EXECUTABLE}
+ARG APP_ROOT
 
 RUN apt-get -y update && apt-get install -y --no-install-recommends \
     # ADD YOUR PACKAGES HERE
@@ -49,9 +48,15 @@ RUN apt-get -y update && apt-get install -y --no-install-recommends \
 # DO NOT REMOVE THIS LABEL: this is used for VS Code automation
 	&& apt-get clean && apt-get autoremove && rm -rf /var/lib/apt/lists/*
 
-# copy the build
-COPY --from=Build /build/bin/Release/net6.0/linux-${IMAGE_ARCH}/publish /app
+# Copy the application compiled in the build step to the $APP_ROOT directory
+# path inside the container, where $APP_ROOT is the torizon_app_root
+# configuration defined in settings.json
+COPY --from=Build ${APP_ROOT}/bin/Release/net8.0/linux-${IMAGE_ARCH}/publish ${APP_ROOT}
 
-# ADD YOUR ARGUMENTS HERE
-CMD [ "./app/gpioDotnet" ]
+# "cd" (enter) into the APP_ROOT directory
+WORKDIR ${APP_ROOT}
+
+# Command executed in runtime when the container starts
+CMD ["./gpioDotnet"]
+
 # DEPLOY -----------------------------------------------------------------------
