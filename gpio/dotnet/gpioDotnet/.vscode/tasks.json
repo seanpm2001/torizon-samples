@@ -8,7 +8,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/test.csproj",
+                "${workspaceFolder}/gpioDotnet.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary",
                 "-c",
@@ -27,7 +27,7 @@
             "type": "process",
             "args": [
                 "clean",
-                "${workspaceFolder}/test.csproj",
+                "${workspaceFolder}/gpioDotnet.csproj",
                 "-c",
                 "Debug"
             ],
@@ -44,7 +44,7 @@
             "type": "process",
             "args": [
                 "clean",
-                "${workspaceFolder}/test.csproj",
+                "${workspaceFolder}/gpioDotnet.csproj",
                 "-c",
                 "Debug",
                 "-r",
@@ -63,7 +63,7 @@
             "type": "process",
             "args": [
                 "clean",
-                "${workspaceFolder}/test.csproj",
+                "${workspaceFolder}/gpioDotnet.csproj",
                 "-c",
                 "Debug",
                 "-r",
@@ -82,7 +82,7 @@
             "type": "process",
             "args": [
                 "clean",
-                "${workspaceFolder}/test.csproj",
+                "${workspaceFolder}/gpioDotnet.csproj",
                 "-c",
                 "Debug",
                 "-r",
@@ -103,7 +103,7 @@
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/test.csproj"
+                "${workspaceFolder}/gpioDotnet.csproj"
             ],
             "problemMatcher": "$msCompile",
             "icon": {
@@ -118,7 +118,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/test.csproj",
+                "${workspaceFolder}/gpioDotnet.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary",
                 "-c",
@@ -168,7 +168,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/test.csproj",
+                "${workspaceFolder}/gpioDotnet.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary",
                 "-c",
@@ -218,7 +218,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/test.csproj",
+                "${workspaceFolder}/gpioDotnet.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary",
                 "-c",
@@ -373,7 +373,7 @@
                 "${command:docker_login}",
                 "${command:docker_tag}",
                 "${command:docker_registry}",
-                "test",
+                "gpiodotnet",
                 "${config:torizon_gpu}"
             ],
             "dependsOrder": "sequence",
@@ -420,7 +420,7 @@
                     "DOCKER_TAG": "${command:docker_tag}",
                     "TCB_CLIENTID": "${command:tcb.clientId}",
                     "TCB_CLIENTSECRET": "${command:tcb.clientSecret}",
-                    "TCB_PACKAGE": "test",
+                    "TCB_PACKAGE": "gpioDotnet",
                     "TCB_FLEET": "${command:tcb.fleetName}",
                     "TORIZON_ARCH": "${command:torizon_arch}"
                 }
@@ -472,7 +472,7 @@
                 "update",
                 "fleet",
                 "latest",
-                "test",
+                "gpioDotnet",
                 "${command:tcb.fleetName}"
             ],
             "problemMatcher": [
@@ -496,7 +496,7 @@
                     "DOCKER_PSSWD": "${command:docker_password}",
                     "DOCKER_LOGIN": "${command:docker_login}",
                     "DOCKER_REGISTRY": "${command:docker_registry}",
-                    "VSCODE_CMD": "--verbose platform push --credentials credentials.zip --package-name test --package-version ${command:tcb.getNextPackageVersion} --login-to $DOCKER_REGISTRY $DOCKER_LOGIN $DOCKER_PSSWD --canonicalize docker-compose.prod.yml"
+                    "VSCODE_CMD": "--verbose platform push --credentials credentials.zip --package-name gpioDotnet --package-version ${command:tcb.getNextPackageVersion} --login-to $DOCKER_REGISTRY $DOCKER_LOGIN $DOCKER_PSSWD --canonicalize docker-compose.prod.yml"
                 }
             },
             "args": [
@@ -990,7 +990,7 @@
                 "SSH_DEBUG_PORT=${config:torizon_debug_ssh_port}",
                 "--build-arg",
                 "GPU=${config:torizon_gpu}",
-                "test-debug"
+                "gpiodotnet-debug"
             ],
             "dependsOrder": "sequence",
             "dependsOn": [
@@ -1034,7 +1034,7 @@
                 "SSH_DEBUG_PORT=${config:torizon_debug_ssh_port}",
                 "--build-arg",
                 "GPU=${config:torizon_gpu}",
-                "test-debug"
+                "gpiodotnet-debug"
             ],
             "dependsOrder": "sequence",
             "dependsOn": [
@@ -1078,7 +1078,7 @@
                 "SSH_DEBUG_PORT=${config:torizon_debug_ssh_port}",
                 "--build-arg",
                 "GPU=${config:torizon_gpu}",
-                "test-debug"
+                "gpiodotnet-debug"
             ],
             "dependsOrder": "sequence",
             "dependsOn": [
@@ -1122,7 +1122,7 @@
                 "SSH_DEBUG_PORT=${config:torizon_debug_ssh_port}",
                 "--build-arg",
                 "GPU=${config:torizon_gpu}",
-                "test-debug"
+                "gpiodotnet-debug"
             ],
             "dependsOrder": "sequence",
             "dependsOn": [
@@ -1148,7 +1148,7 @@
                 "${workspaceFolder}/Dockerfile.sdk",
                 "${workspaceFolder}",
                 "-t",
-                "cross-toolchain-arm64-test",
+                "cross-toolchain-arm64-gpiodotnet",
                 "--build-arg",
                 "IMAGE_ARCH=arm64",
                 "--build-arg",
@@ -1182,7 +1182,7 @@
                 "${workspaceFolder}/Dockerfile.sdk",
                 "${workspaceFolder}",
                 "-t",
-                "cross-toolchain-arm-test",
+                "cross-toolchain-arm-gpiodotnet",
                 "--build-arg",
                 "IMAGE_ARCH=arm",
                 "--build-arg",
@@ -1214,7 +1214,7 @@
                 "${workspaceFolder}/Dockerfile.sdk",
                 "${workspaceFolder}",
                 "-t",
-                "cross-toolchain-amd64-test",
+                "cross-toolchain-amd64-gpiodotnet",
                 "--build-arg",
                 "IMAGE_ARCH=amd64",
                 "--build-arg",
@@ -1246,7 +1246,7 @@
                 "${workspaceFolder}/Dockerfile.sdk",
                 "${workspaceFolder}",
                 "-t",
-                "cross-toolchain-riscv64-test",
+                "cross-toolchain-riscv64-gpiodotnet",
                 "--build-arg",
                 "IMAGE_ARCH=riscv64",
                 "--build-arg",
@@ -1280,7 +1280,7 @@
                 "docker",
                 "compose",
                 "push",
-                "test-debug"
+                "gpiodotnet-debug"
             ],
             "dependsOrder": "sequence",
             "problemMatcher": "$msCompile",
@@ -1305,7 +1305,7 @@
                 "docker",
                 "compose",
                 "push",
-                "test-debug"
+                "gpiodotnet-debug"
             ],
             "dependsOrder": "sequence",
             "problemMatcher": "$msCompile",
@@ -1330,7 +1330,7 @@
                 "docker",
                 "compose",
                 "push",
-                "test-debug"
+                "gpiodotnet-debug"
             ],
             "dependsOrder": "sequence",
             "problemMatcher": "$msCompile",
@@ -1355,7 +1355,7 @@
                 "docker",
                 "compose",
                 "push",
-                "test-debug"
+                "gpiodotnet-debug"
             ],
             "dependsOrder": "sequence",
             "problemMatcher": "$msCompile",
@@ -1381,7 +1381,7 @@
                 "-o",
                 "StrictHostKeyChecking=no",
                 "torizon@${config:torizon_ip}",
-                "LOCAL_REGISTRY=${config:host_ip} TAG=arm64 docker compose pull test-debug"
+                "LOCAL_REGISTRY=${config:host_ip} TAG=arm64 docker compose pull gpiodotnet-debug"
             ],
             "dependsOrder": "sequence",
             "dependsOn": [
@@ -1410,7 +1410,7 @@
                 "-o",
                 "StrictHostKeyChecking=no",
                 "torizon@${config:torizon_ip}",
-                "LOCAL_REGISTRY=${config:host_ip} TAG=arm docker compose pull test-debug"
+                "LOCAL_REGISTRY=${config:host_ip} TAG=arm docker compose pull gpiodotnet-debug"
             ],
             "dependsOrder": "sequence",
             "dependsOn": [
@@ -1439,7 +1439,7 @@
                 "-o",
                 "StrictHostKeyChecking=no",
                 "torizon@${config:torizon_ip}",
-                "LOCAL_REGISTRY=${config:host_ip} TAG=amd64 docker compose pull test-debug"
+                "LOCAL_REGISTRY=${config:host_ip} TAG=amd64 docker compose pull gpiodotnet-debug"
             ],
             "dependsOrder": "sequence",
             "dependsOn": [
@@ -1468,7 +1468,7 @@
                 "-o",
                 "StrictHostKeyChecking=no",
                 "torizon@${config:torizon_ip}",
-                "LOCAL_REGISTRY=${config:host_ip} TAG=riscv64 docker compose pull test-debug"
+                "LOCAL_REGISTRY=${config:host_ip} TAG=riscv64 docker compose pull gpiodotnet-debug"
             ],
             "dependsOrder": "sequence",
             "dependsOn": [
@@ -1496,7 +1496,7 @@
                 "torizon",
                 "up",
                 "-d",
-                "test-debug"
+                "gpiodotnet-debug"
             ],
             "dependsOrder": "sequence",
             "dependsOn": [
@@ -1524,7 +1524,7 @@
                 "torizon",
                 "up",
                 "-d",
-                "test-debug"
+                "gpiodotnet-debug"
             ],
             "dependsOrder": "sequence",
             "dependsOn": [
@@ -1552,7 +1552,7 @@
                 "torizon",
                 "up",
                 "-d",
-                "test-debug"
+                "gpiodotnet-debug"
             ],
             "dependsOrder": "sequence",
             "dependsOn": [
@@ -1580,7 +1580,7 @@
                 "torizon",
                 "up",
                 "-d",
-                "test-debug"
+                "gpiodotnet-debug"
             ],
             "dependsOrder": "sequence",
             "dependsOn": [
@@ -1618,7 +1618,7 @@
                 "IMAGE_ARCH=arm64",
                 "--build-arg",
                 "GPU=${config:torizon_gpu}",
-                "test"
+                "gpiodotnet"
             ],
             "dependsOrder": "sequence",
             "dependsOn": [
@@ -1656,7 +1656,7 @@
                 "IMAGE_ARCH=arm",
                 "--build-arg",
                 "GPU=${config:torizon_gpu}",
-                "test"
+                "gpiodotnet"
             ],
             "dependsOrder": "sequence",
             "dependsOn": [
@@ -1694,7 +1694,7 @@
                 "IMAGE_ARCH=amd64",
                 "--build-arg",
                 "GPU=${config:torizon_gpu}",
-                "test"
+                "gpiodotnet"
             ],
             "dependsOrder": "sequence",
             "dependsOn": [
@@ -1732,7 +1732,7 @@
                 "IMAGE_ARCH=riscv64",
                 "--build-arg",
                 "GPU=${config:torizon_gpu}",
-                "test"
+                "gpiodotnet"
             ],
             "dependsOrder": "sequence",
             "dependsOn": [
@@ -1760,7 +1760,7 @@
                 "docker",
                 "compose",
                 "push",
-                "test"
+                "gpiodotnet"
             ],
             "dependsOn": [
                 "build-container-torizon-release-arm64"
@@ -1788,7 +1788,7 @@
                 "docker",
                 "compose",
                 "push",
-                "test"
+                "gpiodotnet"
             ],
             "dependsOn": [
                 "build-container-torizon-release-arm"
@@ -1816,7 +1816,7 @@
                 "docker",
                 "compose",
                 "push",
-                "test"
+                "gpiodotnet"
             ],
             "dependsOn": [
                 "build-container-torizon-release-amd64"
@@ -1844,7 +1844,7 @@
                 "docker",
                 "compose",
                 "push",
-                "test"
+                "gpiodotnet"
             ],
             "dependsOn": [
                 "build-container-torizon-release-riscv64"
@@ -1873,7 +1873,7 @@
                 "-o",
                 "StrictHostKeyChecking=no",
                 "torizon@${config:torizon_ip}",
-                "DOCKER_LOGIN=${config:host_ip}:5002 TAG=arm64 docker compose pull test"
+                "DOCKER_LOGIN=${config:host_ip}:5002 TAG=arm64 docker compose pull gpiodotnet"
             ],
             "dependsOrder": "sequence",
             "dependsOn": [
@@ -1902,7 +1902,7 @@
                 "-o",
                 "StrictHostKeyChecking=no",
                 "torizon@${config:torizon_ip}",
-                "DOCKER_LOGIN=${config:host_ip}:5002 TAG=arm docker compose pull test"
+                "DOCKER_LOGIN=${config:host_ip}:5002 TAG=arm docker compose pull gpiodotnet"
             ],
             "dependsOrder": "sequence",
             "dependsOn": [
@@ -1931,7 +1931,7 @@
                 "-o",
                 "StrictHostKeyChecking=no",
                 "torizon@${config:torizon_ip}",
-                "DOCKER_LOGIN=${config:host_ip}:5002 TAG=amd64 docker compose pull test"
+                "DOCKER_LOGIN=${config:host_ip}:5002 TAG=amd64 docker compose pull gpiodotnet"
             ],
             "dependsOrder": "sequence",
             "dependsOn": [
@@ -1960,7 +1960,7 @@
                 "-o",
                 "StrictHostKeyChecking=no",
                 "torizon@${config:torizon_ip}",
-                "DOCKER_LOGIN=${config:host_ip}:5002 TAG=riscv64 docker compose pull test"
+                "DOCKER_LOGIN=${config:host_ip}:5002 TAG=riscv64 docker compose pull gpiodotnet"
             ],
             "dependsOrder": "sequence",
             "dependsOn": [
@@ -1986,7 +1986,7 @@
                 "-p",
                 "torizon",
                 "up",
-                "test"
+                "gpiodotnet"
             ],
             "dependsOrder": "sequence",
             "dependsOn": [
@@ -2019,7 +2019,7 @@
                 "-p",
                 "torizon",
                 "up",
-                "test"
+                "gpiodotnet"
             ],
             "dependsOrder": "sequence",
             "dependsOn": [
@@ -2052,7 +2052,7 @@
                 "-p",
                 "torizon",
                 "up",
-                "test"
+                "gpiodotnet"
             ],
             "dependsOrder": "sequence",
             "dependsOn": [
@@ -2085,7 +2085,7 @@
                 "-p",
                 "torizon",
                 "up",
-                "test"
+                "gpiodotnet"
             ],
             "dependsOrder": "sequence",
             "dependsOn": [
@@ -2166,7 +2166,7 @@
                     "DOCKER_TAG": "${command:docker_tag}",
                     "TCB_CLIENTID": "${command:tcb.clientId}",
                     "TCB_CLIENTSECRET": "${command:tcb.clientSecret}",
-                    "TCB_PACKAGE": "test",
+                    "TCB_PACKAGE": "gpioDotnet",
                     "TCB_FLEET": "${command:tcb.fleetName}",
                     "TORIZON_ARCH": "${command:torizon_arch}"
                 }
