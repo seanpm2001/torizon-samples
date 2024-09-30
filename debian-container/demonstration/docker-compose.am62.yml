@@ -1,7 +1,6 @@
-version: "2.4"
 services:
   weston:
-    image: torizon/weston:2
+    image: torizon/weston-am62:next
     # Required to get udev events from host udevd via netlink
     network_mode: host
     ipc: host
@@ -23,33 +22,18 @@ services:
       - 'c 4:0 rmw'
       # ... for tty7
       - 'c 4:7 rmw'
+      # ... for tt1
+      - 'c 4:1 rmw'
       # ... for /dev/input devices
       - 'c 13:* rmw'
       # ... for /dev/dri devices
       - 'c 226:* rmw'
 
-  portainer:
-    image: portainer/portainer-ce:2.9.3
-    command: --templates https://feeds.toradex.com/portainer/4/@@MACHINE@@/templates.json --logo https://docs.toradex.com/109812-torizon-logo-portainer.svg -H unix:///var/run/docker.sock
-    restart: always
-    ports:
-      - 8840:9000
-    volumes:
-      - type: volume
-        source: portainer_data
-        target: /data
-      - type: bind
-        source: /var/run/docker.sock
-        target: /var/run/docker.sock
-
   kiosk:
-    image: torizon/chromium-x11:2
-    environment:
-        - MACHINE
+    image: torizon/chromium-am62:next
     security_opt:
       - seccomp:unconfined
-    command: http://portainer:9000
-    ipc: host
+    command: https://toradex.com
     volumes:
       - type: bind
         source: /tmp
@@ -61,12 +45,9 @@ services:
         source: /dev/dri
         target: /dev/dri
     depends_on:
-      - portainer
       - weston
     shm_size: '256mb'
     device_cgroup_rules:
       # ... for /dev/dri devices
       - 'c 226:* rmw'
 
-volumes:
-  portainer_data:

@@ -1,7 +1,6 @@
-version: "2.4"
 services:
   weston:
-    image: torizon/weston-vivante:2
+    image: torizon/weston-imx8:next
     # EULA required to run imx8 vivante graphic drivers
     # Pre-accept as we ask the user accept the EULA already.
     environment:
@@ -26,6 +25,8 @@ services:
       - 'c 4:0 rmw'
       # ... for tty7
       - 'c 4:7 rmw'
+      # ... for tty1
+      - 'c 4:1 rmw'
       # ... for /dev/input devices
       - 'c 13:* rmw'
       # ... for /dev/dri devices
@@ -33,28 +34,11 @@ services:
       # ... for /dev/galcore device
       - 'c 199:* rmw'
 
-  portainer:
-    image: portainer/portainer-ce:2.9.3
-    command: --templates https://feeds.toradex.com/portainer/4/@@MACHINE@@/templates.json --logo https://docs.toradex.com/109812-torizon-logo-portainer.svg -H unix:///var/run/docker.sock
-    restart: always    
-    ports:
-      - 8840:9000
-    volumes:
-      - type: volume
-        source: portainer_data
-        target: /data
-      - type: bind
-        source: /var/run/docker.sock
-        target: /var/run/docker.sock
-
   kiosk:
-    environment:
-      - MACHINE
-    image: torizon/chromium:2
-    platform: linux/arm64
+    image: torizon/chromium-imx8:next
     security_opt:
       - seccomp:unconfined
-    command: http://portainer:9000
+    command: https://toradex.com
     shm_size: 256mb
     volumes:
       - type: bind
@@ -64,14 +48,11 @@ services:
         source: /var/run/dbus
         target: /var/run/dbus
       - type: bind
-        source: /dev/galcore
-        target: /dev/galcore
+        source: /dev
+        target: /dev
+    privileged: true
     depends_on:
-      - portainer
       - weston
     device_cgroup_rules:
       # ... for /dev/galcore device
       - 'c 199:* rmw'
-
-volumes:
-  portainer_data:
